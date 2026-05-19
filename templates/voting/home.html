@@ -41,5 +41,13 @@
         <span class="check">&#10004;</span>
         <span class="label">Vota Aquí</span>
     </a>
+    <a href="{% url 'voting:resultados_login' %}" style="margin-top:2rem;padding:0.7rem 2rem;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:var(--text-muted);text-decoration:none;font-size:1rem;transition:all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">Ver Resultados</a>
 </div>
+<div class="glass-card" style="margin-top:2rem;text-align:center;padding:1.5rem;max-width:400px;margin-left:auto;margin-right:auto;">
+    <div style="font-size:1rem;color:var(--text-muted);margin-bottom:0.3rem;">Votos Registrados</div>
+    <div id="total-votos-home" style="font-size:2.5rem;font-weight:bold;color:#818cf8;">0</div>
+</div>
+<script>
+    fetch('{% url "voting:vote_count_api" %}').then(r=>r.json()).then(d=>{document.getElementById('total-votos-home').textContent=d.total;}).catch(()=>{});
+</script>
 {% endblock %}

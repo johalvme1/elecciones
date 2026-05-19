@@ -3,29 +3,72 @@
 {% block content %}
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
     <h1>Resultados de la Votación</h1>
-    <a href="{% url 'voting:ballot' %}" class="glass-card" style="padding: 0.8rem 1.5rem; text-decoration: none; font-weight: bold;">Volver a la Papeleta</a>
+    <div style="display:flex;gap:0.5rem;">
+        {% if not user.is_authenticated or not user.is_staff %}
+            <a href="{% url 'voting:resultados_logout' %}" style="padding: 0.8rem 1.5rem; background:rgba(239,68,68,0.2); border:1px solid rgba(239,68,68,0.3); border-radius:8px; color:#ef4444; text-decoration:none; font-weight:bold;">Cerrar Resultados</a>
+        {% endif %}
+        <a href="{% url 'voting:home' %}" class="glass-card" style="padding: 0.8rem 1.5rem; text-decoration: none; font-weight: bold;">Volver al Inicio</a>
+    </div>
 </div>
 
-<div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
-    <a href="{% url 'voting:add_party' %}" style="padding: 1rem; background: var(--primary); color: white; border-radius: 8px; text-decoration: none; font-weight: bold; text-align: center; flex: 1;">+ Agregar Partido (Logo)</a>
-    <a href="{% url 'voting:add_candidate' %}" style="padding: 1rem; background: #22c55e; color: white; border-radius: 8px; text-decoration: none; font-weight: bold; text-align: center; flex: 1;">+ Agregar Candidato (Foto)</a>
+{% if user.is_staff %}
+<div style="margin-bottom: 2rem; text-align: center;">
+    <a href="{% url 'voting:add_candidate' %}" style="padding: 0.8rem 2rem; background: #22c55e; color: white; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;">+ Agregar Candidato</a>
 </div>
+{% endif %}
 
-<div class="glass-card" style="margin-bottom: 2rem;">
-    <h2>Resultados Globales</h2>
-    <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
-        <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
-            <th style="text-align: left; padding: 1rem; font-size: 1.2rem;">Candidato</th>
-            <th style="text-align: right; padding: 1rem; font-size: 1.2rem;">Votos Totales</th>
-        </tr>
-        {% for candidate in global_results %}
-        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-            <td style="padding: 1rem; font-size: 1.1rem;">{{ candidate.name }}</td>
-            <td style="text-align: right; padding: 1rem; font-size: 1.5rem; font-weight: bold; color: #818cf8;">{{ candidate.total_votes }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;">
+    <div class="glass-card">
+        <h2>Resultados Globales</h2>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                <th style="text-align: left; padding: 1rem; font-size: 1.2rem;">Candidato</th>
+                <th style="text-align: right; padding: 1rem; font-size: 1.2rem;">Votos Totales</th>
+            </tr>
+            {% for candidate in global_results %}
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <td style="padding: 1rem; font-size: 1.1rem;"><span id="dot-{{ forloop.counter0 }}" style="display:inline-block;width:14px;height:14px;border-radius:50%;margin-right:0.5rem;vertical-align:middle;"></span>{{ candidate.name }}</td>
+                <td style="text-align: right; padding: 1rem; font-size: 1.5rem; font-weight: bold; color: #818cf8;">{{ candidate.total_votes }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="glass-card" style="display:flex;flex-direction:column;align-items:center;">
+        <h2>Distribución de Votos</h2>
+        <canvas id="pieChart" width="250" height="250" style="margin-top:1rem;"></canvas>
+    </div>
 </div>
+<script>
+    var labels = [{% for c in global_results %}"{{ c.name }}"{% if not forloop.last %},{% endif %}{% endfor %}];
+    var values = [{% for c in global_results %}{{ c.total_votes }}{% if not forloop.last %},{% endif %}{% endfor %}];
+    var colors = ['#4F46E5','#22c55e','#f59e0b','#ef4444','#ec4899','#06b6d4','#8b5cf6','#14b8a6'];
+    var total = values.reduce(function(a,b){return a+b},0);
+    for (var i=0; i<values.length; i++) {
+        document.getElementById('dot-'+i).style.background = colors[i % colors.length];
+    }
+    var ctx = document.getElementById('pieChart').getContext('2d');
+    if (total > 0) {
+        var startAngle = -Math.PI/2;
+        for (var i=0; i<values.length; i++) {
+            var sliceAngle = (values[i]/total) * 2 * Math.PI;
+            ctx.beginPath();
+            ctx.moveTo(125,125);
+            ctx.arc(125,125,110,startAngle,startAngle+sliceAngle);
+            ctx.closePath();
+            ctx.fillStyle = colors[i % colors.length];
+            ctx.fill();
+            ctx.strokeStyle = '#0f172a';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            startAngle += sliceAngle;
+        }
+    } else {
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '16px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Sin votos', 125, 130);
+    }
+</script>
 
 <h2>Resultados por Sección</h2>
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">

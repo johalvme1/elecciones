@@ -43,19 +43,7 @@
         margin: 0;
         text-shadow: 0 2px 4px rgba(0,0,0,0.8);
     }
-    .party-logo {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background: white;
-        object-fit: contain;
-        padding: 5px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-        border: 2px solid white;
-    }
+
 </style>
 {% endblock %}
 
@@ -90,13 +78,9 @@
                     <div class="candidate-photo" style="background:#333; display:flex; align-items:center; justify-content:center; font-size: 1.5rem;">Sin Foto</div>
                 {% endif %}
                 
-                {% if candidate.party.logo %}
-                    <img src="{{ candidate.party.logo.url }}" class="party-logo" alt="{{ candidate.party.name }}">
-                {% endif %}
                 
                 <div class="candidate-info">
                     <h2 class="candidate-name">{{ candidate.name }}</h2>
-                    <p style="margin: 0.5rem 0 0 0; color: #cbd5e1; font-size: 1.2rem;">{{ candidate.party.name }}</p>
                 </div>
             </div>
         </form>
