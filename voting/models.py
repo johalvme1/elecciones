@@ -1,0 +1,38 @@
+from django.db import models
+from django.contrib.auth.models import User
+
+class Section(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Nombre de Sección")
+    
+    def __str__(self):
+        return self.name
+
+class Station(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="station")
+    section = models.ForeignKey(Section, on_delete=models.CASCADE, verbose_name="Sección")
+    
+    def __str__(self):
+        return f"Estación: {self.user.username} - {self.section.name}"
+
+class Party(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Partido Político")
+    logo = models.ImageField(upload_to='parties/', verbose_name="Logo del Partido")
+    
+    def __str__(self):
+        return self.name
+
+class Candidate(models.Model):
+    name = models.CharField(max_length=150, verbose_name="Nombre del Candidato")
+    photo = models.ImageField(upload_to='candidates/', verbose_name="Foto del Candidato")
+    party = models.ForeignKey(Party, on_delete=models.CASCADE, verbose_name="Partido")
+    
+    def __str__(self):
+        return self.name
+
+class Vote(models.Model):
+    section = models.ForeignKey(Section, on_delete=models.CASCADE)
+    candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"Voto para {self.candidate.name} en {self.section.name}"

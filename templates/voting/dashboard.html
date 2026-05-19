@@ -1,0 +1,46 @@
+{% extends 'voting/base.html' %}
+{% block title %}Dashboard de Resultados{% endblock %}
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>Resultados de la Votación</h1>
+    <a href="{% url 'voting:ballot' %}" class="glass-card" style="padding: 0.8rem 1.5rem; text-decoration: none; font-weight: bold;">Volver a la Papeleta</a>
+</div>
+
+<div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+    <a href="{% url 'voting:add_party' %}" style="padding: 1rem; background: var(--primary); color: white; border-radius: 8px; text-decoration: none; font-weight: bold; text-align: center; flex: 1;">+ Agregar Partido (Logo)</a>
+    <a href="{% url 'voting:add_candidate' %}" style="padding: 1rem; background: #22c55e; color: white; border-radius: 8px; text-decoration: none; font-weight: bold; text-align: center; flex: 1;">+ Agregar Candidato (Foto)</a>
+</div>
+
+<div class="glass-card" style="margin-bottom: 2rem;">
+    <h2>Resultados Globales</h2>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+            <th style="text-align: left; padding: 1rem; font-size: 1.2rem;">Candidato</th>
+            <th style="text-align: right; padding: 1rem; font-size: 1.2rem;">Votos Totales</th>
+        </tr>
+        {% for candidate in global_results %}
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <td style="padding: 1rem; font-size: 1.1rem;">{{ candidate.name }}</td>
+            <td style="text-align: right; padding: 1rem; font-size: 1.5rem; font-weight: bold; color: #818cf8;">{{ candidate.total_votes }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<h2>Resultados por Sección</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+    {% for section, candidate_results in results.items %}
+    <div class="glass-card">
+        <h3 style="margin-top: 0; color: #93c5fd; font-size: 1.4rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">{{ section.name }}</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+            {% for row in candidate_results %}
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <td style="padding: 0.8rem 0; font-size: 1.1rem;">{{ row.candidate.name }}</td>
+                <td style="text-align: right; font-weight: bold; font-size: 1.2rem; color: #818cf8;">{{ row.count }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

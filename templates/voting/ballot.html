@@ -1,0 +1,102 @@
+{% extends 'voting/base.html' %}
+{% block title %}Papeleta Virtual{% endblock %}
+{% block extra_css %}
+<style>
+    .candidates-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+    .candidate-card {
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s;
+        text-align: center;
+        padding: 0;
+        border-radius: 16px;
+    }
+    .candidate-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(79, 70, 229, 0.3);
+        border-color: rgba(79, 70, 229, 0.5);
+    }
+    .candidate-photo {
+        width: 100%;
+        height: 350px;
+        object-fit: cover;
+        display: block;
+    }
+    .candidate-info {
+        padding: 1.5rem;
+        background: rgba(0,0,0,0.7);
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .candidate-name {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 0;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    }
+    .party-logo {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: white;
+        object-fit: contain;
+        padding: 5px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+        border: 2px solid white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="text-align: center; margin-bottom: 2rem;">
+    <h1 style="font-size: 2.8rem; margin-bottom: 0.5rem;">Papeleta de Votación</h1>
+    <p style="color: var(--text-muted); font-size: 1.4rem;">Haz clic en la foto de tu candidato para votar</p>
+</div>
+
+<div class="candidates-grid">
+    {% for candidate in candidates %}
+        <form method="POST" id="form-{{ candidate.id }}" style="margin:0;">
+            {% csrf_token %}
+            <input type="hidden" name="candidate_id" value="{{ candidate.id }}">
+            <div class="glass-card candidate-card" onclick="document.getElementById('form-{{ candidate.id }}').submit();">
+                {% if candidate.photo %}
+                    <img src="{{ candidate.photo.url }}" class="candidate-photo" alt="{{ candidate.name }}">
+                {% else %}
+                    <div class="candidate-photo" style="background:#333; display:flex; align-items:center; justify-content:center; font-size: 1.5rem;">Sin Foto</div>
+                {% endif %}
+                
+                {% if candidate.party.logo %}
+                    <img src="{{ candidate.party.logo.url }}" class="party-logo" alt="{{ candidate.party.name }}">
+                {% endif %}
+                
+                <div class="candidate-info">
+                    <h2 class="candidate-name">{{ candidate.name }}</h2>
+                    <p style="margin: 0.5rem 0 0 0; color: #cbd5e1; font-size: 1.2rem;">{{ candidate.party.name }}</p>
+                </div>
+            </div>
+        </form>
+    {% empty %}
+        <p style="text-align: center; grid-column: 1 / -1; font-size: 1.2rem; color: var(--text-muted);">No hay candidatos registrados aún.</p>
+    {% endfor %}
+</div>
+
+{% if messages %}
+<script>
+    // Refresh page after 2 seconds to clean up success message and prepare for next voter
+    setTimeout(function() {
+        window.location.href = "{% url 'voting:ballot' %}";
+    }, 2000);
+</script>
+{% endif %}
+{% endblock %}

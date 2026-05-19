@@ -1,0 +1,47 @@
+{% extends 'voting/base.html' %}
+{% block title %}Inicio{% endblock %}
+{% block content %}
+<div style="text-align: center; margin-top: 1rem; margin-bottom: 2rem;">
+    <h2 style="font-size: 2rem; color: var(--text-muted); margin-bottom: 1rem;">Tiempo restante para la elección:</h2>
+    <div class="countdown glass-card" id="countdown-timer" style="font-size: 5rem; padding: 2rem; display: inline-block; color: #a5b4fc; font-weight: 800; letter-spacing: 5px; text-shadow: 0 0 30px rgba(79, 70, 229, 0.8);">Cargando...</div>
+</div>
+
+<div class="glass-card" style="max-width: 400px; margin: 0 auto; text-align: center;">
+    <h2>Acceso de Estación</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div style="margin-bottom: 1rem; text-align: left;">
+            <label style="display:block; margin-bottom: 0.5rem; color: var(--text-muted);">Usuario</label>
+            <input type="text" name="username" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); color: white; box-sizing:border-box;" required>
+        </div>
+        <div style="margin-bottom: 1.5rem; text-align: left;">
+            <label style="display:block; margin-bottom: 0.5rem; color: var(--text-muted);">Contraseña</label>
+            <input type="password" name="password" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); color: white; box-sizing:border-box;" required>
+        </div>
+        <button type="submit" style="width: 100%; padding: 1rem; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background 0.3s;">Entrar a la Estación</button>
+    </form>
+</div>
+
+<script>
+    const votingDate = new Date('May 29, 2026 08:00:00').getTime();
+    const x = setInterval(function() {
+        const now = new Date().getTime();
+        const distance = votingDate - now;
+        const countdownEl = document.getElementById("countdown-timer");
+        if (!countdownEl) return;
+        
+        if (distance < 0) {
+            clearInterval(x);
+            countdownEl.innerHTML = "¡Es el Día de la Votación!";
+            return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        countdownEl.innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+    }, 1000);
+</script>
+{% endblock %}
