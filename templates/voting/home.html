@@ -1,0 +1,45 @@
+{% extends 'voting/base.html' %}
+{% block title %}Inicio - Elecciones 2026{% endblock %}
+{% block extra_css %}
+<style>
+    .vote-btn {
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        background: white;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 40px rgba(255,255,255,0.3), 0 10px 30px rgba(0,0,0,0.3);
+        transition: transform 0.3s, box-shadow 0.3s;
+        text-decoration: none;
+    }
+    .vote-btn:hover {
+        transform: scale(1.08);
+        box-shadow: 0 0 60px rgba(255,255,255,0.5), 0 15px 40px rgba(0,0,0,0.4);
+    }
+    .vote-btn .check {
+        font-size: 5rem;
+        color: #22c55e;
+        line-height: 1;
+    }
+    .vote-btn .label {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #1e293b;
+        margin-top: 0.3rem;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;">
+    <h2 style="font-size: 2.2rem; margin-bottom: 2rem; color: var(--text-muted);">Bienvenido a la plataforma de votación</h2>
+    <a href="{% url 'voting:ballot' %}" class="vote-btn">
+        <span class="check">&#10004;</span>
+        <span class="label">Vota Aquí</span>
+    </a>
+</div>
+{% endblock %}

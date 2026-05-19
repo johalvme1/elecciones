@@ -5,7 +5,8 @@ from django.contrib.auth import views as auth_views
 app_name = 'voting'
 
 urlpatterns = [
-    path('', views.ballot_view, name='ballot'),
+    path('', views.home_view, name='home'),
+    path('votar/', views.ballot_view, name='ballot'),
     path('dashboard/', views.dashboard_view, name='dashboard'),
     path('dashboard/add-party/', views.add_party_view, name='add_party'),
     path('dashboard/add-candidate/', views.add_candidate_view, name='add_candidate'),

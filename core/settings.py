@@ -127,5 +127,5 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = 'voting:login'
-LOGIN_REDIRECT_URL = 'voting:ballot'
+LOGIN_REDIRECT_URL = 'voting:home'
 LOGOUT_REDIRECT_URL = 'voting:login'

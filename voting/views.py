@@ -6,6 +6,10 @@ from .models import Candidate, Vote, Station, Section
 from .forms import PartyForm, CandidateForm
 
 @login_required
+def home_view(request):
+    return render(request, 'voting/home.html')
+
+@login_required
 def ballot_view(request):
     try:
         station = request.user.station
@@ -16,13 +20,15 @@ def ballot_view(request):
         
     candidates = Candidate.objects.select_related('party').all()
     
+    voto_ok = request.session.pop('voto_ok', False)
+
     if request.method == 'POST':
         candidate_id = request.POST.get('candidate_id')
         if candidate_id:
             try:
                 candidate = Candidate.objects.get(id=candidate_id)
                 Vote.objects.create(section=station.section, candidate=candidate)
-                messages.success(request, f'¡Voto registrado!')
+                request.session['voto_ok'] = True
                 return redirect('voting:ballot')
             except Candidate.DoesNotExist:
                 messages.error(request, 'Candidato no válido.')
@@ -30,6 +36,7 @@ def ballot_view(request):
     return render(request, 'voting/ballot.html', {
         'candidates': candidates,
         'station': station,
+        'voto_ok': voto_ok,
     })
 
 @user_passes_test(lambda u: u.is_staff)

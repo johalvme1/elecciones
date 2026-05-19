@@ -70,7 +70,8 @@
             <img src="/media/logoEscuela.jpg" alt="Logo Escuela" style="height: 100px; object-fit: contain; border-radius: 8px; background: white; padding: 5px;">
         </div>
         <div style="flex: 2; text-align: center;">
-            <h1 style="margin: 0; font-size: 3.5rem; text-transform: uppercase; letter-spacing: 2px; color: #818cf8; text-shadow: 0 0 20px rgba(129,140,248,0.5);">Elecciones 2026</h1>
+            <div style="font-size: 2rem; font-weight: bold; text-transform: uppercase; letter-spacing: 3px; color: #fbbf24; text-shadow: 0 0 25px rgba(251,191,36,0.6), 0 2px 4px rgba(0,0,0,0.5); margin-bottom: 0.3rem;">Escuela Joaquín L Sancho Quesada</div>
+            <h1 style="margin: 0; font-size: 2.5rem; text-transform: uppercase; letter-spacing: 2px; color: #818cf8; text-shadow: 0 0 20px rgba(129,140,248,0.5);">Elecciones 2026</h1>
         </div>
         <div style="flex: 1; text-align: right; display: flex; flex-direction: column; align-items: flex-end; justify-content: center;">
             {% if user.is_authenticated %}
@@ -86,13 +87,15 @@
     </header>
 
     <main class="container">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="glass-card" style="margin-bottom: 1rem; text-align: center; border-color: #22c55e; background: rgba(34, 197, 94, 0.1); color: #4ade80;">
-                    <h3 style="margin:0; font-size: 2rem;">{{ message }}</h3>
-                </div>
-            {% endfor %}
-        {% endif %}
+        {% block messages_area %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="glass-card" style="margin-bottom: 1rem; text-align: center; border-color: #22c55e; background: rgba(34, 197, 94, 0.1); color: #4ade80;">
+                        <h3 style="margin:0; font-size: 2rem;">{{ message }}</h3>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endblock %}
         {% block content %}{% endblock %}
     </main>
 

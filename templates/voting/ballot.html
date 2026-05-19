@@ -1,12 +1,13 @@
 {% extends 'voting/base.html' %}
 {% block title %}Papeleta Virtual{% endblock %}
+{% block messages_area %}{% if voto_ok %}{% else %}{{ block.super }}{% endif %}{% endblock %}
 {% block extra_css %}
 <style>
     .candidates-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 2rem;
-        margin-top: 2rem;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
     }
     .candidate-card {
         position: relative;
@@ -24,7 +25,7 @@
     }
     .candidate-photo {
         width: 100%;
-        height: 350px;
+        height: 220px;
         object-fit: cover;
         display: block;
     }
@@ -37,7 +38,7 @@
         box-sizing: border-box;
     }
     .candidate-name {
-        font-size: 1.5rem;
+        font-size: 1.2rem;
         font-weight: bold;
         margin: 0;
         text-shadow: 0 2px 4px rgba(0,0,0,0.8);
@@ -46,8 +47,8 @@
         position: absolute;
         top: 15px;
         right: 15px;
-        width: 70px;
-        height: 70px;
+        width: 50px;
+        height: 50px;
         border-radius: 50%;
         background: white;
         object-fit: contain;
@@ -59,9 +60,22 @@
 {% endblock %}
 
 {% block content %}
+
+{% if voto_ok %}
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;">
+    <div style="font-size:5rem;margin-bottom:1rem;">&#10004;</div>
+    <h1 style="font-size:3rem;color:#4ade80;margin:0 0 1rem 0;">¡Voto Registrado!</h1>
+    <p id="countdown-msg" style="font-size:1.5rem;color:var(--text-muted);"></p>
+</div>
+<script>
+    setTimeout(function() {
+        window.location.href = "{% url 'voting:home' %}";
+    }, 2000);
+</script>
+{% else %}
 <div style="text-align: center; margin-bottom: 2rem;">
     <h1 style="font-size: 2.8rem; margin-bottom: 0.5rem;">Papeleta de Votación</h1>
-    <p style="color: var(--text-muted); font-size: 1.4rem;">Haz clic en la foto de tu candidato para votar</p>
+    <p style="color: var(--text-muted); font-size: 1.2rem;">Haz clic en la foto de tu candidato para votar</p>
 </div>
 
 <div class="candidates-grid">
@@ -90,13 +104,5 @@
         <p style="text-align: center; grid-column: 1 / -1; font-size: 1.2rem; color: var(--text-muted);">No hay candidatos registrados aún.</p>
     {% endfor %}
 </div>
-
-{% if messages %}
-<script>
-    // Refresh page after 2 seconds to clean up success message and prepare for next voter
-    setTimeout(function() {
-        window.location.href = "{% url 'voting:ballot' %}";
-    }, 2000);
-</script>
 {% endif %}
 {% endblock %}
