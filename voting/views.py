@@ -6,11 +6,11 @@ from django.http import JsonResponse
 from .models import Candidate, Vote, Station, Section
 
 ORDEN = Case(
-    When(id=6, then=Value(1)),  # CAPI
-    When(id=3, then=Value(2)),  # NEXO
-    When(id=4, then=Value(3)),  # PARE
-    When(id=5, then=Value(4)),  # ECO
-    When(id=2, then=Value(5)),  # NULO
+    When(id=1, then=Value(1)),  # CAPI
+    When(id=2, then=Value(2)),  # ECO
+    When(id=3, then=Value(3)),  # PARE
+    When(id=4, then=Value(4)),  # NEXO
+    When(id=5, then=Value(5)),  # NULO — último
     output_field=IntegerField(),
 )
 from .forms import PartyForm, CandidateForm
