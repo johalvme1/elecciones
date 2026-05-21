@@ -3,7 +3,7 @@ from .models import Section, Station, Party, Candidate, Vote
 
 @admin.register(Section)
 class SectionAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+    list_display = ('name', 'total_students')
 
 @admin.register(Station)
 class StationAdmin(admin.ModelAdmin):
@@ -19,6 +19,6 @@ class CandidateAdmin(admin.ModelAdmin):
 
 @admin.register(Vote)
 class VoteAdmin(admin.ModelAdmin):
-    list_display = ('candidate', 'section', 'timestamp')
+    list_display = ('candidate', 'section', 'station', 'timestamp')
     list_filter = ('section', 'candidate')
     date_hierarchy = 'timestamp'

@@ -14,6 +14,10 @@ db.sqlite3
 # Uploaded media
 media/
 
+# opencode config
+opencode.json
+mcp_example_server.py
+
 # IDE
 .vscode/
 .idea/

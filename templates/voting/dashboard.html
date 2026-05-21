@@ -4,10 +4,25 @@
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
     <h1>Resultados de la Votación</h1>
     <div style="display:flex;gap:0.5rem;">
-        {% if not user.is_authenticated or not user.is_staff %}
-            <a href="{% url 'voting:resultados_logout' %}" style="padding: 0.8rem 1.5rem; background:rgba(239,68,68,0.2); border:1px solid rgba(239,68,68,0.3); border-radius:8px; color:#ef4444; text-decoration:none; font-weight:bold;">Cerrar Resultados</a>
-        {% endif %}
         <a href="{% url 'voting:home' %}" class="glass-card" style="padding: 0.8rem 1.5rem; text-decoration: none; font-weight: bold;">Volver al Inicio</a>
+    </div>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:2rem;">
+    <div class="glass-card" style="text-align:center;border-color:rgba(79,70,229,0.3);">
+        <div style="font-size:0.9rem;color:#94a3b8;text-transform:uppercase;margin-bottom:0.5rem;">Votaron</div>
+        <div style="font-size:2.5rem;font-weight:bold;color:#22c55e;">{{ total_votos }}</div>
+        <div style="font-size:0.85rem;color:#94a3b8;">de {{ total_estudiantes }} estudiantes</div>
+    </div>
+    <div class="glass-card" style="text-align:center;border-color:rgba(245,158,11,0.3);">
+        <div style="font-size:0.9rem;color:#94a3b8;text-transform:uppercase;margin-bottom:0.5rem;">Pendientes</div>
+        <div style="font-size:2.5rem;font-weight:bold;color:#f59e0b;">{{ pendientes }}</div>
+        <div style="font-size:0.85rem;color:#94a3b8;">estudiantes</div>
+    </div>
+    <div class="glass-card" style="text-align:center;border-color:rgba(129,140,248,0.3);">
+        <div style="font-size:0.9rem;color:#94a3b8;text-transform:uppercase;margin-bottom:0.5rem;">Participación</div>
+        <div style="font-size:2.5rem;font-weight:bold;color:#818cf8;">{{ porcentaje }}%</div>
+        <div style="font-size:0.85rem;color:#94a3b8;">del total de estudiantes</div>
     </div>
 </div>
 
@@ -80,6 +95,23 @@
             <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                 <td style="padding: 0.8rem 0; font-size: 1.1rem;">{{ row.candidate.name }}</td>
                 <td style="text-align: right; font-weight: bold; font-size: 1.2rem; color: #818cf8;">{{ row.count }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endfor %}
+</div>
+
+<h2>Resultados por Estación</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem;">
+    {% for s in station_results %}
+    <div class="glass-card">
+        <h3 style="margin-top: 0; color: #93c5fd; font-size: 1.4rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">{{ s.usuario }} <span style="font-size:0.9rem;color:#94a3b8;">({{ s.seccion }})</span></h3>
+        <table style="width: 100%; border-collapse: collapse;">
+            {% for voto in s.votos %}
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <td style="padding: 0.8rem 0; font-size: 1.1rem;">{{ voto.candidate.name }}</td>
+                <td style="text-align: right; font-weight: bold; font-size: 1.2rem; color: #818cf8;">{{ voto.count }}</td>
             </tr>
             {% endfor %}
         </table>

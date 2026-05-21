@@ -1,10 +1,18 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
-from django.db.models import Count
+from django.db.models import Count, Case, When, Value, IntegerField
 from django.http import JsonResponse
-from django.conf import settings
 from .models import Candidate, Vote, Station, Section
+
+ORDEN = Case(
+    When(id=6, then=Value(1)),  # CAPI
+    When(id=3, then=Value(2)),  # NEXO
+    When(id=4, then=Value(3)),  # PARE
+    When(id=5, then=Value(4)),  # ECO
+    When(id=2, then=Value(5)),  # NULO
+    output_field=IntegerField(),
+)
 from .forms import PartyForm, CandidateForm
 
 @login_required
@@ -16,11 +24,11 @@ def ballot_view(request):
     try:
         station = request.user.station
     except Station.DoesNotExist:
-        if request.user.is_staff:
+        if request.user.is_superuser:
             return redirect('voting:dashboard')
         return render(request, 'voting/error.html', {'message': 'Este usuario no está configurado como una Estación de Votación.'})
         
-    candidates = Candidate.objects.select_related('party').all()
+    candidates = Candidate.objects.select_related('party').all().order_by(ORDEN)
     
     voto_ok = request.session.pop('voto_ok', False)
 
@@ -29,7 +37,7 @@ def ballot_view(request):
         if candidate_id:
             try:
                 candidate = Candidate.objects.get(id=candidate_id)
-                Vote.objects.create(section=station.section, candidate=candidate)
+                Vote.objects.create(station=station, section=station.section, candidate=candidate)
                 request.session['voto_ok'] = True
                 return redirect('voting:ballot')
             except Candidate.DoesNotExist:
@@ -45,40 +53,46 @@ def vote_count_api(request):
     total = Vote.objects.count()
     return JsonResponse({'total': total})
 
-def resultados_login(request):
-    if request.method == 'POST':
-        pin = request.POST.get('pin', '')
-        if pin == settings.RESULTS_PIN:
-            request.session['results_access'] = True
-            return redirect('voting:dashboard')
-        messages.error(request, 'PIN incorrecto.')
-    return render(request, 'voting/resultados_login.html')
-
-def resultados_logout(request):
-    request.session.pop('results_access', None)
-    return redirect('voting:home')
-
-def can_access_results(request):
-    return request.user.is_staff or request.session.get('results_access', False)
-
 def dashboard_view(request):
-    if not can_access_results(request):
-        return redirect('voting:resultados_login')
+    if not request.user.is_superuser:
+        return redirect('voting:home')
     sections = Section.objects.all()
     results = {}
-    candidates = Candidate.objects.all()
+    candidates = Candidate.objects.all().order_by(ORDEN)
     for section in sections:
         section_results = []
         for candidate in candidates:
             count = Vote.objects.filter(section=section, candidate=candidate).count()
             section_results.append({'candidate': candidate, 'count': count})
         results[section] = section_results
+
+    stations = Station.objects.select_related('section', 'user').all()
+    station_results = []
+    for station in stations:
+        station_votos = []
+        for candidate in candidates:
+            count = Vote.objects.filter(station=station, candidate=candidate).count()
+            station_votos.append({'candidate': candidate, 'count': count})
+        station_results.append({
+            'usuario': station.user.username,
+            'seccion': station.section.name,
+            'votos': station_votos,
+        })
         
-    global_results = Candidate.objects.annotate(total_votes=Count('vote')).order_by('-total_votes')
+    global_results = Candidate.objects.annotate(total_votes=Count('vote')).order_by(ORDEN)
+    total_votos = Vote.objects.count()
+    total_estudiantes = sum(s.total_students for s in sections)
+    pendientes = max(0, total_estudiantes - total_votos)
+    porcentaje = round((total_votos / total_estudiantes * 100), 1) if total_estudiantes > 0 else 0
     
     return render(request, 'voting/dashboard.html', {
         'results': results,
         'global_results': global_results,
+        'station_results': station_results,
+        'total_votos': total_votos,
+        'total_estudiantes': total_estudiantes,
+        'pendientes': pendientes,
+        'porcentaje': porcentaje,
     })
 
 @user_passes_test(lambda u: u.is_staff)

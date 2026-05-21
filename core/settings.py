@@ -129,5 +129,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'voting:login'
 LOGIN_REDIRECT_URL = 'voting:home'
 LOGOUT_REDIRECT_URL = 'voting:login'
-
-RESULTS_PIN = '2026'

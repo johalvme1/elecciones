@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 
 class Section(models.Model):
     name = models.CharField(max_length=100, verbose_name="Nombre de Sección")
+    total_students = models.IntegerField(default=0, verbose_name="Total de Estudiantes")
     
     def __str__(self):
         return self.name
@@ -30,6 +31,7 @@ class Candidate(models.Model):
         return self.name
 
 class Vote(models.Model):
+    station = models.ForeignKey(Station, on_delete=models.CASCADE, null=True, blank=True)
     section = models.ForeignKey(Section, on_delete=models.CASCADE)
     candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
