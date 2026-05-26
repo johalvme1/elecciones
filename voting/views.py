@@ -122,9 +122,7 @@ def add_candidate_view(request):
 # ─── KINDER (sin PIN, directo) ──────────────────────────────────────────────
 
 def kinder_ballot_view(request):
-    ya_voto = request.session.get('kinder_voto', False)
-
-    if request.method == 'POST' and not ya_voto:
+    if request.method == 'POST':
         candidate_id = request.POST.get('candidate_id')
         if candidate_id:
             try:
@@ -133,16 +131,12 @@ def kinder_ballot_view(request):
                     candidate=candidate,
                     session_key=request.session.session_key or 'anonymous'
                 )
-                request.session['kinder_voto'] = True
                 return render(request, 'voting/kinder_exito.html')
             except Candidate.DoesNotExist:
                 pass
 
     candidates = Candidate.objects.select_related('party').all().order_by(ORDEN)
-    return render(request, 'voting/kinder_ballot.html', {
-        'candidates': candidates,
-        'ya_voto': ya_voto,
-    })
+    return render(request, 'voting/kinder_ballot.html', {'candidates': candidates})
 
 @user_passes_test(lambda u: u.is_superuser)
 def kinder_dashboard_view(request):
