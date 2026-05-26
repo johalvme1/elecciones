@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.db.models import Count, Case, When, Value, IntegerField
 from django.http import JsonResponse
-from .models import Candidate, Vote, Station, Section, PinKinder, VotoKinder
+from .models import Candidate, Vote, Station, Section, VotoKinder
 
 ORDEN = Case(
     When(id=1, then=Value(1)),  # CAPI
@@ -119,50 +119,34 @@ def add_candidate_view(request):
         form = CandidateForm()
     return render(request, 'voting/add_form.html', {'form': form, 'title': 'Agregar Candidato'})
 
-# ─── KINDER ──────────────────────────────────────────────────────────────────
-
-def kinder_pin_view(request):
-    if request.method == 'POST':
-        pin = request.POST.get('pin', '').strip()
-        try:
-            p = PinKinder.objects.get(code=pin, used=False)
-        except PinKinder.DoesNotExist:
-            return render(request, 'voting/kinder_pin.html', {'error': 'PIN inválido o ya usado.'})
-        request.session['kinder_pin'] = pin
-        return redirect('voting:kinder_ballot')
-    return render(request, 'voting/kinder_pin.html')
+# ─── KINDER (sin PIN, directo) ──────────────────────────────────────────────
 
 def kinder_ballot_view(request):
-    pin = request.session.get('kinder_pin')
-    if not pin:
-        return redirect('voting:kinder_pin')
-    try:
-        p = PinKinder.objects.get(code=pin, used=False)
-    except PinKinder.DoesNotExist:
-        del request.session['kinder_pin']
-        return redirect('voting:kinder_pin')
+    ya_voto = request.session.get('kinder_voto', False)
 
-    if request.method == 'POST':
+    if request.method == 'POST' and not ya_voto:
         candidate_id = request.POST.get('candidate_id')
         if candidate_id:
             try:
                 candidate = Candidate.objects.get(id=candidate_id)
-                VotoKinder.objects.create(candidate=candidate, pin=pin)
-                p.used = True
-                p.save()
-                del request.session['kinder_pin']
+                VotoKinder.objects.create(
+                    candidate=candidate,
+                    session_key=request.session.session_key or 'anonymous'
+                )
+                request.session['kinder_voto'] = True
                 return render(request, 'voting/kinder_exito.html')
             except Candidate.DoesNotExist:
                 pass
-        return redirect('voting:kinder_pin')
 
     candidates = Candidate.objects.select_related('party').all().order_by(ORDEN)
-    return render(request, 'voting/kinder_ballot.html', {'candidates': candidates})
+    return render(request, 'voting/kinder_ballot.html', {
+        'candidates': candidates,
+        'ya_voto': ya_voto,
+    })
 
 @user_passes_test(lambda u: u.is_superuser)
 def kinder_dashboard_view(request):
-    votos = VotoKinder.objects.select_related('candidate').all()
-    total = votos.count()
+    total = VotoKinder.objects.count()
     resultados = Candidate.objects.annotate(
         total_kinder=Count('votokinder')
     ).order_by(ORDEN)

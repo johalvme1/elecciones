@@ -13,7 +13,6 @@ urlpatterns = [
     path('api/vote-count/', views.vote_count_api, name='vote_count_api'),
     path('login/', auth_views.LoginView.as_view(template_name='voting/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
-    path('kinder/', views.kinder_pin_view, name='kinder_pin'),
-    path('kinder/votar/', views.kinder_ballot_view, name='kinder_ballot'),
+    path('kinder/', views.kinder_ballot_view, name='kinder_ballot'),
     path('dashboard/kinder/', views.kinder_dashboard_view, name='kinder_dashboard'),
 ]

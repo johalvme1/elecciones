@@ -39,16 +39,9 @@ class Vote(models.Model):
     def __str__(self):
         return f"Voto para {self.candidate.name} en {self.section.name}"
 
-class PinKinder(models.Model):
-    code = models.CharField(max_length=20, unique=True, verbose_name="Código PIN")
-    used = models.BooleanField(default=False, verbose_name="Usado")
-    def __str__(self):
-        estado = "✓ usado" if self.used else "○ disponible"
-        return f"{self.code} - {estado}"
-
 class VotoKinder(models.Model):
     candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE, verbose_name="Candidato")
-    pin = models.CharField(max_length=20, verbose_name="PIN usado")
+    session_key = models.CharField(max_length=40, verbose_name="Sesión", db_index=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return f"Kinder: {self.candidate.name} (PIN: {self.pin})"
+        return f"Kinder: {self.candidate.name}"

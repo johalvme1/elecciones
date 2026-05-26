@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Section, Station, Party, Candidate, Vote, PinKinder, VotoKinder
+from .models import Section, Station, Party, Candidate, Vote, VotoKinder
 
 @admin.register(Section)
 class SectionAdmin(admin.ModelAdmin):
@@ -23,14 +23,8 @@ class VoteAdmin(admin.ModelAdmin):
     list_filter = ('section', 'candidate')
     date_hierarchy = 'timestamp'
 
-@admin.register(PinKinder)
-class PinKinderAdmin(admin.ModelAdmin):
-    list_display = ('code', 'used')
-    list_filter = ('used',)
-    search_fields = ('code',)
-
 @admin.register(VotoKinder)
 class VotoKinderAdmin(admin.ModelAdmin):
-    list_display = ('candidate', 'pin', 'timestamp')
+    list_display = ('candidate', 'timestamp')
     list_filter = ('candidate',)
     date_hierarchy = 'timestamp'
