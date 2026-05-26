@@ -1,0 +1,167 @@
+{% extends 'voting/base.html' %}
+{% block title %}Papeleta Virtual{% endblock %}
+{% block messages_area %}{% if voto_ok %}{% else %}{{ block.super }}{% endif %}{% endblock %}
+{% block extra_css %}
+<style>
+    .candidates-grid {
+        display: flex;
+        justify-content: center;
+        gap: 1.2rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+    }
+    .candidate-wrap {
+        flex: 0 1 200px;
+        min-width: 0;
+    }
+    .candidate-wrap form { height: 100%; }
+    .candidate-card {
+        position: relative;
+        overflow: hidden;
+        height: 100%;
+        cursor: pointer;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s;
+        text-align: center;
+        padding: 0;
+        border-radius: 16px;
+    }
+    .candidate-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(79, 70, 229, 0.3);
+        border-color: rgba(79, 70, 229, 0.5);
+    }
+    .candidate-photo {
+        width: 100%;
+        height: 220px;
+        object-fit: contain;
+        background: #1a1a2e;
+        display: block;
+    }
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.85);
+        z-index: 999;
+        align-items: center;
+        justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-box {
+        background: #1e293b;
+        border-radius: 20px;
+        padding: 2rem;
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 0 60px rgba(79,70,229,0.3);
+    }
+    .modal-box img {
+        width: 100%;
+        height: 300px;
+        object-fit: contain;
+        border-radius: 12px;
+        background: #0f172a;
+        margin-bottom: 1rem;
+    }
+    .modal-box h2 {
+        font-size: 1.5rem;
+        color: #f8fafc;
+        margin: 0 0 1.5rem 0;
+    }
+    .modal-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+    .modal-buttons button {
+        padding: 0.8rem 2rem;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        border: none;
+        transition: transform 0.2s;
+    }
+    .modal-buttons button:hover { transform: scale(1.05); }
+    .btn-confirm { background: #22c55e; color: white; }
+    .btn-cancel { background: rgba(255,255,255,0.1); color: #94a3b8; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% if voto_ok %}
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;">
+    <div style="font-size:5rem;margin-bottom:1rem;">&#10004;</div>
+    <h1 style="font-size:3rem;color:#4ade80;margin:0 0 1rem 0;">¡Voto Registrado!</h1>
+    <p id="countdown-msg" style="font-size:1.5rem;color:var(--text-muted);"></p>
+</div>
+<script>
+    setTimeout(function() {
+        window.location.href = "{% url 'voting:home' %}";
+    }, 2000);
+</script>
+{% else %}
+<div style="text-align: center; margin-bottom: 2rem;">
+    <h1 style="font-size: 2.8rem; margin-bottom: 0.5rem;">Papeleta de Votación</h1>
+    <p style="color: var(--text-muted); font-size: 1.2rem;">Haz clic en la foto del candidato para votar</p>
+</div>
+
+<div class="candidates-grid">
+    {% for candidate in candidates %}
+        <div class="candidate-wrap">
+            <form method="POST" id="form-{{ candidate.id }}" style="margin:0;">
+                {% csrf_token %}
+                <input type="hidden" name="candidate_id" value="{{ candidate.id }}">
+                <div class="glass-card candidate-card" onclick="confirmarVoto('{{ candidate.id }}', '{{ candidate.photo.url }}', '{{ candidate.name }}', '{{ candidate.party.name }}')">
+                    {% if candidate.photo %}
+                        <img src="{{ candidate.photo.url }}" class="candidate-photo" alt="{{ candidate.name }}">
+                    {% else %}
+                        <div class="candidate-photo" style="background:#333; display:flex; align-items:center; justify-content:center; font-size: 1.5rem;">Sin Foto</div>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    {% empty %}
+        <p style="text-align: center; grid-column: 1 / -1; font-size: 1.2rem; color: var(--text-muted); margin-top:3rem;">No hay candidatos registrados aún.</p>
+    {% endfor %}
+</div>
+
+<div class="modal-overlay" id="modal-confirm">
+    <div class="modal-box">
+        <img id="modal-photo" src="" alt="">
+        <h2 id="modal-name"></h2>
+        <p style="color:#94a3b8;margin-bottom:1.5rem;">Confirma su voto para <span id="modal-partido" style="color:#818cf8;font-weight:bold;"></span></p>
+        <div class="modal-buttons">
+            <button class="btn-cancel" onclick="cancelarVoto()">Cancelar</button>
+            <button class="btn-confirm" id="btn-confirmar">Confirmar Voto</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    var candidatoSeleccionado = null;
+    function confirmarVoto(id, foto, nombre, partido) {
+        candidatoSeleccionado = id;
+        document.getElementById('modal-photo').src = foto;
+        document.getElementById('modal-name').textContent = nombre;
+        document.getElementById('modal-partido').textContent = partido;
+        document.getElementById('modal-confirm').classList.add('show');
+    }
+    function cancelarVoto() {
+        document.getElementById('modal-confirm').classList.remove('show');
+        candidatoSeleccionado = null;
+    }
+    document.getElementById('btn-confirmar').addEventListener('click', function() {
+        if (candidatoSeleccionado) {
+            document.getElementById('form-' + candidatoSeleccionado).submit();
+        }
+    });
+    document.getElementById('modal-confirm').addEventListener('click', function(e) {
+        if (e.target === this) cancelarVoto();
+    });
+</script>
+{% endif %}
+{% endblock %}

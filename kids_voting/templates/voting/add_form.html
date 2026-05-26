@@ -1,0 +1,30 @@
+{% extends 'voting/base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="glass-card" style="max-width: 500px; margin: 2rem auto;">
+    <h2 style="text-align: center; margin-top: 0;">{{ title }}</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        {% for field in form %}
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display:block; margin-bottom: 0.5rem; color: var(--text-muted); font-weight: bold;">
+                    {{ field.label }}
+                </label>
+                {{ field }}
+                {% if field.help_text %}
+                    <small style="color: #64748b;">{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                    <p style="color: #ef4444; margin-top: 0.2rem;">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+            <button type="submit" style="flex: 1; padding: 1rem; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer;">Guardar</button>
+            <a href="{% url 'voting:dashboard' %}" style="flex: 1; text-align: center; padding: 1rem; background: rgba(255,255,255,0.1); color: white; border: none; border-radius: 8px; font-size: 1.1rem; text-decoration: none; display: flex; align-items: center; justify-content: center;">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

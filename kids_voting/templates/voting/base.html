@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Elecciones{% endblock %}</title>
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --bg-color: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at top right, #1e1b4b, #0f172a);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            flex: 1;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        .countdown {
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: rgba(79, 70, 229, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(79, 70, 229, 0.3);
+        }
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;display:flex;align-items:center;justify-content:center;opacity:0.06;">
+        <img src="/media/logoEscuela.jpg" alt="" style="width:90vw;height:90vh;object-fit:contain;">
+    </div>
+    <div style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;font-size:3rem;overflow:hidden;">
+        <div style="position:absolute;top:10%;left:2%;animation:floatUp 4s ease-in-out infinite;">&#10004;</div>
+        <div style="position:absolute;top:30%;left:1%;animation:floatUp 5s ease-in-out 0.5s infinite;">&#128203;</div>
+        <div style="position:absolute;top:55%;left:3%;animation:floatUp 4.5s ease-in-out 1s infinite;">&#10004;</div>
+        <div style="position:absolute;top:75%;left:1%;animation:floatUp 5.5s ease-in-out 1.5s infinite;">&#128203;</div>
+        <div style="position:absolute;top:15%;right:2%;animation:floatUp 4.2s ease-in-out 0.3s infinite;">&#10004;</div>
+        <div style="position:absolute;top:40%;right:1%;animation:floatUp 5.2s ease-in-out 0.8s infinite;">&#128203;</div>
+        <div style="position:absolute;top:60%;right:3%;animation:floatUp 4.8s ease-in-out 1.2s infinite;">&#10004;</div>
+        <div style="position:absolute;top:85%;right:1%;animation:floatUp 5.8s ease-in-out 1.8s infinite;">&#128203;</div>
+    </div>
+    <style>
+        @keyframes floatUp {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+    </style>
+    <header class="header">
+        <div style="flex: 1; text-align: left; display: flex; flex-direction: column; align-items: flex-start;">
+            <img src="/media/logoEscuela.jpg" alt="Logo Escuela" style="height: 100px; object-fit: contain; border-radius: 8px; background: white; padding: 5px;">
+            <div style="margin-top:0.4rem;font-size:0.85rem;color:var(--text-muted);">
+                Votos Registrados: <span id="total-votos">0</span>
+            </div>
+        </div>
+        <div style="flex: 2; text-align: center;">
+            <div style="font-size: 2rem; font-weight: bold; text-transform: uppercase; letter-spacing: 3px; color: #fbbf24; text-shadow: 0 0 25px rgba(251,191,36,0.6), 0 2px 4px rgba(0,0,0,0.5); margin-bottom: 0.3rem;">Escuela Joaquín L Sancho Quesada</div>
+            <h1 style="margin: 0; font-size: 2.5rem; text-transform: uppercase; letter-spacing: 2px; color: #818cf8; text-shadow: 0 0 20px rgba(129,140,248,0.5);">Elecciones Estudiantiles 2026</h1>
+        </div>
+        <div style="flex: 1; text-align: right; display: flex; flex-direction: column; align-items: flex-end; justify-content: center;">
+            {% if user.is_authenticated %}
+                <div style="font-size: 1rem; margin-top: 10px;">
+                    <span>Estación: {{ user.username }}</span> | 
+                    <form action="{% url 'voting:logout' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" style="background:transparent; color:#ef4444; border:none; cursor:pointer; font-weight:bold; font-size: 1rem;">Salir</button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+    </header>
+
+    <main class="container">
+        {% block messages_area %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="glass-card" style="margin-bottom: 1rem; text-align: center; border-color: #22c55e; background: rgba(34, 197, 94, 0.1); color: #4ade80;">
+                        <h3 style="margin:0; font-size: 2rem;">{{ message }}</h3>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endblock %}
+        {% block content %}{% endblock %}
+    </main>
+
+
+<script>
+    function actualizarVotos() {
+        fetch('{% url "voting:vote_count_api" %}')
+            .then(r => r.json())
+            .then(d => { document.getElementById('total-votos').textContent = d.total; })
+            .catch(() => {});
+    }
+    actualizarVotos();
+    setInterval(actualizarVotos, 5000);
+</script>
+</body>
+</html>

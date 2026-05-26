@@ -28,8 +28,7 @@
 
 {% if user.is_staff %}
 <div style="margin-bottom: 2rem; text-align: center;">
-        <a href="{% url 'voting:add_candidate' %}" style="padding: 0.8rem 2rem; background: #22c55e; color: white; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;">+ Agregar Candidato</a>
-        <a href="{% url 'voting:kinder_dashboard' %}" style="padding: 0.8rem 2rem; background: #f59e0b; color: white; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block; margin-left:0.5rem;">🎨 Resultados Kinder</a>
+    <a href="{% url 'voting:add_candidate' %}" style="padding: 0.8rem 2rem; background: #22c55e; color: white; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;">+ Agregar Candidato</a>
 </div>
 {% endif %}
 

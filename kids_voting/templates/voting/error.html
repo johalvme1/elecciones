@@ -1,0 +1,12 @@
+{% extends 'voting/base.html' %}
+{% block title %}Error{% endblock %}
+{% block content %}
+<div class="glass-card" style="text-align: center; max-width: 500px; margin: 4rem auto; border-color: rgba(239, 68, 68, 0.5); background: rgba(239, 68, 68, 0.05);">
+    <h2 style="color: #fca5a5; font-size: 2rem; margin-top:0;">Aviso</h2>
+    <p style="font-size: 1.2rem;">{{ message }}</p>
+    {% if user.is_staff %}
+        <br>
+        <a href="{% url 'voting:dashboard' %}" class="glass-card" style="display: inline-block; margin-top: 1rem; padding: 0.8rem 1.5rem; text-decoration: none; font-weight: bold;">Ir al Dashboard Administrativo</a>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'voting/base.html' %}
+{% block title %}Votación Kinder{% endblock %}
+{% block content %}
+<div style="text-align:center;margin-bottom:2rem;">
+    <h1 style="font-size:2.8rem;margin-bottom:0.5rem;">Papeleta Preescolar 🎨</h1>
+    <p style="color:var(--text-muted);font-size:1.2rem;">Toca la foto de tu candidato favorito</p>
+</div>
+<div class="candidates-grid">
+    {% for candidate in candidates %}
+        <div class="candidate-wrap">
+            <form method="POST" id="form-{{ candidate.id }}" style="margin:0;">
+                {% csrf_token %}
+                <input type="hidden" name="candidate_id" value="{{ candidate.id }}">
+                <div class="glass-card candidate-card" onclick="confirmarVoto('{{ candidate.id }}', '{{ candidate.photo.url }}', '{{ candidate.name }}', '{{ candidate.party.name }}')">
+                    {% if candidate.photo %}
+                        <img src="{{ candidate.photo.url }}" class="candidate-photo" alt="{{ candidate.name }}">
+                    {% else %}
+                        <div class="candidate-photo" style="background:#333;display:flex;align-items:center;justify-content:center;font-size:1.5rem;">Sin Foto</div>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    {% endfor %}
+</div>
+<div class="modal-overlay" id="modal-confirm">
+    <div class="modal-box">
+        <img id="modal-photo" src="" alt="">
+        <h2 id="modal-name"></h2>
+        <p style="color:#94a3b8;margin-bottom:1.5rem;">Confirma su voto para <span id="modal-partido" style="color:#818cf8;font-weight:bold;"></span></p>
+        <div class="modal-buttons">
+            <button class="btn-cancel" onclick="cancelarVoto()">Cancelar</button>
+            <button class="btn-confirm" id="btn-confirmar">Confirmar Voto</button>
+        </div>
+    </div>
+</div>
+<script>
+    var candidatoSeleccionado = null;
+    function confirmarVoto(id, foto, nombre, partido) {
+        candidatoSeleccionado = id;
+        document.getElementById('modal-photo').src = foto;
+        document.getElementById('modal-name').textContent = nombre;
+        document.getElementById('modal-partido').textContent = partido;
+        document.getElementById('modal-confirm').classList.add('show');
+    }
+    function cancelarVoto() {
+        document.getElementById('modal-confirm').classList.remove('show');
+        candidatoSeleccionado = null;
+    }
+    document.getElementById('btn-confirmar').addEventListener('click', function() {
+        if (candidatoSeleccionado) {
+            document.getElementById('form-' + candidatoSeleccionado).submit();
+        }
+    });
+    document.getElementById('modal-confirm').addEventListener('click', function(e) {
+        if (e.target === this) cancelarVoto();
+    });
+</script>
+{% endblock %}

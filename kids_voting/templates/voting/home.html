@@ -43,7 +43,6 @@
     </a>
     {% if user.is_superuser %}
     <a href="{% url 'voting:dashboard' %}" style="margin-top:2rem;padding:0.7rem 2rem;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:var(--text-muted);text-decoration:none;font-size:1rem;transition:all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">Ver Resultados</a>
-    <a href="{% url 'voting:kinder_dashboard' %}" style="margin-top:0.7rem;padding:0.7rem 2rem;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);border-radius:8px;color:#f59e0b;text-decoration:none;font-size:1rem;transition:all 0.3s;" onmouseover="this.style.background='rgba(245,158,11,0.25)'" onmouseout="this.style.background='rgba(245,158,11,0.15)'">🎨 Resultados Kinder</a>
     {% endif %}
 </div>
 <div class="glass-card" style="margin-top:2rem;text-align:center;padding:1.5rem;max-width:400px;margin-left:auto;margin-right:auto;">

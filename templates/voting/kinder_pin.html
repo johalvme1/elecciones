@@ -1,0 +1,22 @@
+{% extends 'voting/base.html' %}
+{% block title %}Votación Kinder{% endblock %}
+{% block content %}
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;">
+    <h1 style="font-size:2.5rem;margin-bottom:1rem;">Votación Preescolar 🎨</h1>
+    <p style="color:var(--text-muted);font-size:1.2rem;margin-bottom:2rem;">Ingresa el PIN que te dio tu maestra</p>
+    <div class="glass-card" style="max-width:400px;width:100%;padding:2.5rem;">
+        <form method="post">
+            {% csrf_token %}
+            <input type="text" name="pin" placeholder="Ingresa tu PIN"
+                   style="width:100%;padding:1rem;font-size:1.5rem;text-align:center;border-radius:10px;border:2px solid rgba(255,255,255,0.2);background:rgba(0,0,0,0.3);color:white;box-sizing:border-box;letter-spacing:8px;"
+                   maxlength="10" required autofocus>
+            <button type="submit" style="width:100%;padding:1rem;margin-top:1.5rem;background:var(--primary);color:white;border:none;border-radius:10px;font-size:1.2rem;font-weight:bold;cursor:pointer;">
+                Ingresar
+            </button>
+        </form>
+        {% if error %}
+            <p style="color:#ef4444;margin-top:1rem;font-weight:bold;">{{ error }}</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
