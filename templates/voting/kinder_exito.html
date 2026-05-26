@@ -7,4 +7,9 @@
     <h1 style="font-size:3rem;color:#4ade80;margin:0 0 1rem 0;">¡Voto Registrado!</h1>
     <p style="font-size:1.5rem;color:var(--text-muted);">Gracias por participar 😊</p>
 </div>
+<script>
+    setTimeout(function() {
+        window.location.href = "{% url 'voting:kinder_ballot' %}";
+    }, 2000);
+</script>
 {% endblock %}
